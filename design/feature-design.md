@@ -9,18 +9,14 @@
 - Deployment via [Vercel](vercel.com)
 
 ### Backend
-- Node.JS
-- Hono Serverless
-  - Cloudflare Workers
-- Websocket
-  - Pusher as Websocket as a service [pusher.com](pusher.com)
+- NestJS
 - Database
   - [Supebase](supabase.com)
 
 ## Client
 
-- [ ] Dashboard Page
-  - [ ] Rooms List
+- [x] Dashboard Page
+  - [x] Rooms List
   - [ ] Gen UserID and Profile via Socket Sessions
 - [ ] Rooms Detail Page
   - [ ] Waiting Queue

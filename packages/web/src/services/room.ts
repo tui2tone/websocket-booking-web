@@ -1,6 +1,15 @@
-import { supabase } from "@/lib/supabase";
-
 export async function getRooms() {
-  const { data } = await supabase.from("rooms").select();
-  return data;
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms`);
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+
+    const json = await response.json();
+    return json?.data || []
+  } catch (error) {
+    return [];
+  }
 }
+
+export async function getRoomById(id: string) {}

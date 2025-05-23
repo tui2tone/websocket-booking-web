@@ -12,7 +12,7 @@ interface RoomItemProps {
 const RoomItem: React.FC<RoomItemProps> = ({ room }) => {
   return (
     <Link href={`/rooms/${room.id}`} passHref>
-      <div className="border bg-white rounded-lg overflow-hidden shadow hover:cursor-pointer">
+      <div className="border bg-white rounded-lg overflow-hidden hover:cursor-pointer">
         <div className="relative">
           <img src="/images/hostel-1.jpg" />
           <div className="absolute transition top-0 z-0 right-0 w-full h-full bg-black bg-opacity-60 hover:bg-opacity-85"></div>
@@ -37,7 +37,7 @@ const RoomItem: React.FC<RoomItemProps> = ({ room }) => {
             )}
           >
             {room.status == RoomStatus.Available && (
-              <span>Available 5/{room.slot} Beds</span>
+              <span>Available {room.available_slot}/{room.slot} Beds</span>
             )}
             {room.status == RoomStatus.FullyBooked && (
               <span>Sorry, Room Fully Booked</span>
