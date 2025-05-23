@@ -3,13 +3,15 @@
 ## TechStack
 
 ### Frontend
-- Next.JS
+- NextJS
 - Tailwind
 - ShaCDN
 - Deployment via [Vercel](vercel.com)
 
 ### Backend
 - Node.JS
+- Hono Serverless
+  - Cloudflare Workers
 - Websocket
   - Pusher as Websocket as a service [pusher.com](pusher.com)
 - Database
