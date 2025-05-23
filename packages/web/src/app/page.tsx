@@ -1,3 +1,4 @@
+import RoomLists from "@/components/Dashboard/RoomLists";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 
@@ -14,12 +15,7 @@ export default function Home() {
           <h2 className="text-center font-bold text-white text-5xl">Secure your stay faster with us</h2>
         </div>
       </div>
-      <div className="container mx-auto max-w-screen-lg -mt-8 px-4 relative">
-        <div className="bg-white shadow-xl px-12 py-12 rounded-xl">
-
-          <h2 className="text-2xl font-semibold">Rooms</h2>
-        </div>
-      </div>
+      <RoomLists />
     </div>
   );
 }

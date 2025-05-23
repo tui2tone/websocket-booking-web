@@ -12,7 +12,7 @@ const Navbar: React.FC = () => {
         <div className="flex-1"></div>
         {/* Profile Menu */}
 
-
+        
       </div>
     </div>
   );
