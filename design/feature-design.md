@@ -5,13 +5,13 @@
 ### Frontend
 - NextJS
 - Tailwind
-- ShaCDN
 - Deployment via [Vercel](vercel.com)
 
 ### Backend
 - NestJS
 - Database
   - [Supebase](supabase.com)
+- SocketIO
 
 ## Client
 
