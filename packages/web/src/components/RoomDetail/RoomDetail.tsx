@@ -42,7 +42,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({ roomId }) => {
           token: user.uuid,
           roomId,
         },
-        (response: any) => {
+        (response: QueueDto) => {
           setQueue({
             status: response?.status as QueueStatus,
             waitQueue: response?.waitQueue || 0,
@@ -83,7 +83,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({ roomId }) => {
           token: user.uuid,
           roomId,
         },
-        (response: any) => {
+        (response: QueueDto) => {
           setQueue({
             status: response?.status as QueueStatus,
             waitQueue: response?.waitQueue || 0,
