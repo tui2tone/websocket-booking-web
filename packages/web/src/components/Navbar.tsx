@@ -1,8 +1,10 @@
+import { useAuth } from "@/hooks/auth.provider";
 import { useSocket } from "@/hooks/socketio.provider";
 import React, { useEffect, useState } from "react";
 
 const Navbar = () => {
   const { isConnected } = useSocket();
+  const { user } = useAuth();
 
   return (
     <div className="w-full shadow-xl ">
@@ -18,7 +20,11 @@ const Navbar = () => {
           </div>
         )}
         <div className="flex-1"></div>
-        {/* Profile Menu */}
+        <div className="flex items-center justify-center gap-2">
+          <div className="text-sm lowercase text-gray-500 font-medium">{user?.email}</div>
+          <img src="/images/avatar.jpg" className="w-8 h-8 rounded-full border border-gray-200" />
+
+        </div>
       </div>
     </div>
   );

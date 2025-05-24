@@ -1,7 +1,7 @@
 export interface User {
     id: number;
     uuid: string;
-    full_name: string;
+    email: string;
     status?: UserStatus | null;
 }
 
