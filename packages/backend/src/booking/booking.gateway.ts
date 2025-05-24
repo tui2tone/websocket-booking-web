@@ -55,6 +55,23 @@ export class BookingGateway {
     }
   }
 
+  @SubscribeMessage('recheckMyBookingQueue')
+  async recheckMyBookingQueue(
+    @MessageBody() dto: JoinBookingQueueDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const queue = await this.service.recheckMyBookingQueue(this.server, dto.roomId, dto.token);
+
+    const totalQueue = queue.totalQueue - maxQueueInRoom <= 0 ? 0 : queue.totalQueue - maxQueueInRoom;
+    const waitQueue = queue.queue_no - maxQueueInRoom <= 0 ? 0 : queue.queue_no - maxQueueInRoom
+    
+    return {
+      totalQueue,
+      waitQueue,
+      status: waitQueue <= 0 ? QueueStatus.OnGoing : QueueStatus.Waiting
+    }
+  }
+
   @SubscribeMessage('unsubscribeToBookingQueue')
   async leftBookingQueue(
     @MessageBody() dto: JoinBookingQueueDto,
@@ -89,10 +106,6 @@ export class BookingGateway {
 
   @SubscribeMessage('booking')
   async bookingBed(@MessageBody() dto: SelectBookingQueueDto) {
-    // Check for select queue that user is selected
-    // Make bed status booked
     await this.service.lockBedQueue(this.server, dto.roomId, dto.bedId, dto.token);
   }
-
-
 }

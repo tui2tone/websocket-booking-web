@@ -47,7 +47,7 @@ const RoomDetail: React.FC<RoomDetailProps> = ({ roomId }) => {
             status: response?.status as QueueStatus,
             waitQueue: response?.waitQueue || 0,
             totalQueue: response?.totalQueue || 0,
-          })
+          });
         }
       );
 
@@ -57,18 +57,42 @@ const RoomDetail: React.FC<RoomDetailProps> = ({ roomId }) => {
         }
       });
 
-      // socket.on("onQueueChanged", (updated) => {});
+      socket.on("onQueueChanged", (updated) => {
+        if (updated.roomId === roomId) {
+          // Room Queue Changed
+          recheckMyQueue()
+        }
+      });
 
       return () => {
         socket.emit("unsubscribeToBookingQueue", {
           token: user.uuid,
           roomId,
         });
-        // socket.off("onQueueChanged");
+        socket.off("onQueueChanged");
         socket.off("updateCurrentBookingView");
       };
     }
   }, [roomId, socket, user?.uuid]);
+
+  const recheckMyQueue = () => {
+    if (socket) {
+      socket.emit(
+        "recheckMyBookingQueue",
+        {
+          token: user.uuid,
+          roomId,
+        },
+        (response: any) => {
+          setQueue({
+            status: response?.status as QueueStatus,
+            waitQueue: response?.waitQueue || 0,
+            totalQueue: response?.totalQueue || 0,
+          });
+        }
+      );
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -86,7 +110,9 @@ const RoomDetail: React.FC<RoomDetailProps> = ({ roomId }) => {
         currentView={currentView}
       />
       {room && queue.status === QueueStatus.OnGoing && <BedLists room={room} />}
-      {room && queue.status === QueueStatus.Waiting && <QueueWaiting waitQueue={queue.waitQueue} />}
+      {room && queue.status === QueueStatus.Waiting && (
+        <QueueWaiting waitQueue={queue.waitQueue} />
+      )}
     </>
   );
 };

@@ -35,6 +35,12 @@ const BedItem: React.FC<BedItemProps> = ({ bed }) => {
     }
   }, [bed, socket, user?.uuid]);
 
+  useEffect(() => {
+    if (bed.status) {
+      setStatus(bed.status);
+    }
+  }, [bed.status]);
+
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     socket?.emit("lockBedQueue", {

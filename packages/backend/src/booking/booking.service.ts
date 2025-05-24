@@ -39,10 +39,15 @@ export class BookingService {
         } as BookingQueue);
     }
 
-    await this.broadcastQueueValidator(server, roomId);
+    await this.broadcastQueueChanged(server, roomId);
     await this.broadcastCurentView(server, roomId);
     await this.broadcastBedStatus(server, roomId, token);
 
+    return await this.getMyQueue(user.id);
+  }
+
+  async recheckMyBookingQueue(server: Server, roomId: number, token: string) {
+    const user = await this.auth.findUserByToken(token);
     return await this.getMyQueue(user.id);
   }
 
@@ -61,6 +66,7 @@ export class BookingService {
     }
     await this.broadcastCurentView(server, roomId);
     await this.broadcastBedStatus(server, roomId, token);
+    await this.broadcastQueueChanged(server, roomId);
   }
 
   async moveQueue(roomId: number, fromQueueNo: number) {
@@ -347,7 +353,9 @@ export class BookingService {
     return false;
   }
 
-  async broadcastQueueValidator(server: Server, roomId: number) {
-    server.emit('updateCurrentBookingView', {});
+  async broadcastQueueChanged(server: Server, roomId: number) {
+    server.emit('onQueueChanged', {
+      roomId
+    });
   }
 }
