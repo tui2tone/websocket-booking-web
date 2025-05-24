@@ -8,5 +8,6 @@ export interface Bed {
 export enum BedStatus {
     Available = 1,
     Locked = 2,
-    Booked = 3
+    Booked = 4,
+    Selected = 3
 }

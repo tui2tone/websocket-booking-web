@@ -24,22 +24,12 @@ export class BookingGateway {
     private auth: AuthService,
   ) {}
 
-  async broadcastCurentView(roomId: number) {
-    const currentView = await this.service.getCurrentViewByRoom(roomId);
-
-    this.server.emit('updateCurrentBookingView', {
-      roomId,
-      currentView,
-    });
-  }
-
   @SubscribeMessage('subscribeToBookingQueue')
   async joinBookingQueue(
     @MessageBody() dto: JoinBookingQueueDto,
     @ConnectedSocket() client: Socket,
   ) {
-    await this.service.joinBookingQueue(dto.roomId, dto.token)
-    await this.broadcastCurentView(dto.roomId);
+    await this.service.joinBookingQueue(this.server, dto.roomId, dto.token);
   }
 
   @SubscribeMessage('unsubscribeToBookingQueue')
@@ -47,24 +37,37 @@ export class BookingGateway {
     @MessageBody() dto: JoinBookingQueueDto,
     @ConnectedSocket() client: Socket,
   ) {
-    await this.service.leftBookingQueue(dto.roomId, dto.token)
-    await this.broadcastCurentView(dto.roomId);
+    await this.service.leftBookingQueue(this.server, dto.roomId, dto.token);
   }
 
-  @SubscribeMessage('select_queue')
-  async selectBookingQueue(
+  @SubscribeMessage('lockBedQueue')
+  async lockBookingQueue(
     @MessageBody() dto: SelectBookingQueueDto,
     @ConnectedSocket() client: Socket,
   ) {
-    // Broadcast to room sockets
-    // User can select or booked only 1 bed for one room
-    // Make bed locked, other user can't select
+    await this.service.lockBedQueue(this.server, dto.roomId, dto.bedId, dto.token);
+  }
+
+  @SubscribeMessage('finishBedQueue')
+  async finishBookingQueue(
+    @MessageBody() dto: SelectBookingQueueDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    await this.service.finishBookingQueue(this.server, dto.roomId, dto.bedId, dto.token);
+  }
+
+  @SubscribeMessage('cancelBedQueue')
+  async cancelBookingQueue(
+    @MessageBody() dto: SelectBookingQueueDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    await this.service.cancelBedQueue(this.server, dto.roomId, dto.token);
   }
 
   @SubscribeMessage('booking')
   async bookingBed(@MessageBody() dto: SelectBookingQueueDto) {
     // Check for select queue that user is selected
     // Make bed status booked
+    await this.service.lockBedQueue(this.server, dto.roomId, dto.bedId, dto.token);
   }
-  
 }

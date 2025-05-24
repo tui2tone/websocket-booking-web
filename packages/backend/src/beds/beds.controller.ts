@@ -15,7 +15,10 @@ export class BedsController {
       .getSupabaseClient()
       .from(tableName)
       .select()
-      .eq('room_id', roomId);
+      .eq('room_id', roomId)
+      .order('bed_no', {
+        ascending: true
+      })
     return {
       data: result.data as Bed[],
     };
