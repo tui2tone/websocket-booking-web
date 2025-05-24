@@ -5,6 +5,7 @@ import { BookingQueue } from './dto/booking.dto';
 import { BedStatus } from 'src/beds/entities/bed.entity';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
+import { Room, RoomStatus } from 'src/rooms/entities/room.entity';
 
 @Injectable()
 export class BookingService {
@@ -101,7 +102,9 @@ export class BookingService {
 
     if (queue?.data) {
       const totalQueue = await this.getCurrentViewByRoom(queue.data.room_id);
-      queue.data.totalQueue = totalQueue || 0;
+      if (queue?.data) {
+        queue.data.totalQueue = totalQueue || 0;
+      }
       return queue?.data;
     }
     return null;
@@ -236,6 +239,7 @@ export class BookingService {
       });
     }
     await this.broadcastBedStatus(server, roomId, token);
+    await this.resetRoomStats(server, roomId);
   }
 
   async cancelBedQueue(server: Server, roomId: number, token: string) {
@@ -355,7 +359,48 @@ export class BookingService {
 
   async broadcastQueueChanged(server: Server, roomId: number) {
     server.emit('onQueueChanged', {
-      roomId
+      roomId,
     });
+  }
+
+  async resetRoomStats(server: Server, roomId: number) {
+    const result = await this.supabase
+      .getSupabaseClient()
+      .from('rooms')
+      .select()
+      .eq('id', roomId)
+      .single();
+
+    let room = result.data as Room;
+
+    // Query all beds
+    const bedResult = await this.supabase
+      .getSupabaseClient()
+      .from('beds')
+      .select()
+      .eq('room_id', roomId);
+
+    const slot = bedResult?.data?.length || 0;
+    const availableSlot =
+      bedResult?.data?.filter((m) => m.status === BedStatus.Available).length ||
+      0;
+    const status =
+      availableSlot === 0 ? RoomStatus.FullyBooked : RoomStatus.Available;
+
+    const updated = await this.supabase
+      .getSupabaseClient()
+      .from('rooms')
+      .update({
+        slot,
+        available_slot: availableSlot,
+        status,
+      })
+      .eq('id', roomId);
+
+    room.slot = slot;
+    room.available_slot = availableSlot;
+    room.status = status;
+
+    server.emit('updateCurrentRoomStatus', room);
   }
 }

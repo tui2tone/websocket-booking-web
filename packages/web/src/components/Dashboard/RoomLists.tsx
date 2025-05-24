@@ -10,7 +10,7 @@ const RoomLists: React.FC = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const result = await getRooms();
+      const result = await getRooms({});
       setRooms(result as Room[]);
     }
     fetchData();
@@ -18,7 +18,7 @@ const RoomLists: React.FC = () => {
 
   return (
     <div className="container mx-auto max-w-screen-lg -mt-8 px-4 relative">
-      <div className="bg-white shadow-xl px-12 py-12 rounded-xl">
+      <div className="bg-white shadow-xl px-12 py-12 rounded-xl  mb-8">
         <h2 className="text-3xl font-semibold mb-6">Rooms</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -62,8 +62,8 @@ export class BookingGateway {
   ) {
     const queue = await this.service.recheckMyBookingQueue(this.server, dto.roomId, dto.token);
 
-    const totalQueue = queue.totalQueue - maxQueueInRoom <= 0 ? 0 : queue.totalQueue - maxQueueInRoom;
-    const waitQueue = queue.queue_no - maxQueueInRoom <= 0 ? 0 : queue.queue_no - maxQueueInRoom
+    const totalQueue = queue?.totalQueue - maxQueueInRoom <= 0 ? 0 : queue?.totalQueue - maxQueueInRoom;
+    const waitQueue = queue?.queue_no - maxQueueInRoom <= 0 ? 0 : queue.queue_no - maxQueueInRoom
     
     return {
       totalQueue,

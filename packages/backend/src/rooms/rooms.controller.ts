@@ -14,13 +14,19 @@ const tableName = 'rooms';
 export class RoomsController {
   constructor(private readonly supabase: SupabaseService) {}
   @Get()
-  async getRooms(@Query() search: string): Promise<{
+  async getRooms(@Query('q') search: string): Promise<{
     data: Room[];
   }> {
-    const result = await this.supabase
-      .getSupabaseClient()
-      .from(tableName)
-      .select();
+    let query = this.supabase.getSupabaseClient().from(tableName).select();
+
+    if (search) {
+      query = query.ilike('name', `%${search}%`);
+    }
+
+    const result = await query.order('id', {
+      ascending: true
+    });
+
     return {
       data: result.data as Room[],
     };
@@ -32,7 +38,7 @@ export class RoomsController {
       .getSupabaseClient()
       .from(tableName)
       .select()
-      .eq('id', id)
+      .eq('id', id);
 
     if (result.data?.length === 0) {
       throw new NotFoundException('Room not found');

@@ -23,6 +23,9 @@ const Navbar = () => {
           </div>
         )}
         <div className="flex-1"></div>
+        <div className="px-6">
+          <Link href={"/admin"} className="text-sm text-neutral-500 underline cursor-pointer">Admin Panel</Link>
+        </div>
         <div className="flex items-center justify-center gap-2">
           <div className="text-sm lowercase text-gray-500 font-medium">
             {user?.email}

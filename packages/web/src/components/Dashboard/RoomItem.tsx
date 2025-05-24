@@ -1,15 +1,42 @@
 "use client";
 
 import { Room, RoomStatus } from "@/dto/room";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import cx from "classnames";
 import Link from "next/link";
+import { useSocket } from "@/hooks/socketio.provider";
+import { useAuth } from "@/hooks/auth.provider";
 
 interface RoomItemProps {
   room: Room;
 }
 
 const RoomItem: React.FC<RoomItemProps> = ({ room }) => {
+  const [currentRoom, setCurrentRoom] = useState<Room>({} as Room);
+  const { socket } = useSocket();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (socket && user.uuid) {
+      socket.on("updateCurrentRoomStatus", (updated) => {
+        if(updated.id) {
+          setCurrentRoom(updated)
+        }
+      });
+
+      return () => {
+        socket.off("updateCurrentRoomStatus");
+      };
+    }
+  }, [room, socket, user?.uuid]);
+
+  useEffect(() => {
+    function setData() {
+      setCurrentRoom(room)
+    }
+    setData();
+  }, [room])
+
   return (
     <Link href={`/rooms/${room.id}`} passHref>
       <div className="border bg-white rounded-lg overflow-hidden hover:cursor-pointer">
@@ -20,7 +47,11 @@ const RoomItem: React.FC<RoomItemProps> = ({ room }) => {
             <div className="uppercase text-white font-semibold opacity-70">
               Room
             </div>
-            <div className="font-bold text-4xl text-white">{room.name}</div>
+            <div className="font-bold text-4xl text-white">{currentRoom.name}</div>
+          </div>
+
+          <div>
+
           </div>
         </div>
 
@@ -30,16 +61,18 @@ const RoomItem: React.FC<RoomItemProps> = ({ room }) => {
               "text-center px-4 py-2 text-lg font-semibold rounded border",
               {
                 [`text-green-700 bg-green-50 border-green-100`]:
-                  room.status == RoomStatus.Available,
+                  currentRoom.status == RoomStatus.Available,
                 [`text-yellow-700 bg-yellow-50 border-yellow-100`]:
-                  room.status == RoomStatus.FullyBooked,
+                  currentRoom.status == RoomStatus.FullyBooked,
               }
             )}
           >
-            {room.status == RoomStatus.Available && (
-              <span>Available {room.available_slot}/{room.slot} Beds</span>
+            {currentRoom.status == RoomStatus.Available && (
+              <span>
+                Available {currentRoom.available_slot}/{currentRoom.slot} Beds
+              </span>
             )}
-            {room.status == RoomStatus.FullyBooked && (
+            {currentRoom.status == RoomStatus.FullyBooked && (
               <span>Sorry, Room Fully Booked</span>
             )}
           </div>
