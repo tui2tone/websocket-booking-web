@@ -16,14 +16,18 @@ export class BookingService {
   async joinBookingQueue(server: Server, roomId: number, token: string) {
     const user = await this.auth.findUserByToken(token);
     const myQueue = await this.getMyQueue(user.id);
+    const nextQueueNo = await this.getNextQueueNoByRoom(roomId);
     if (myQueue) {
-      await this.supabase
-        .getSupabaseClient()
-        .from('booking_queue')
-        .update({
-          room_id: roomId,
-        })
-        .eq('user_id', user.id);
+      if (roomId != myQueue.room_id) {
+        await this.supabase
+          .getSupabaseClient()
+          .from('booking_queue')
+          .update({
+            room_id: roomId,
+            queue_no: nextQueueNo,
+          })
+          .eq('user_id', user.id);
+      }
     } else {
       await this.supabase
         .getSupabaseClient()
@@ -31,11 +35,15 @@ export class BookingService {
         .insert({
           user_id: user.id,
           room_id: roomId,
+          queue_no: nextQueueNo,
         } as BookingQueue);
     }
 
+    await this.broadcastQueueValidator(server, roomId);
     await this.broadcastCurentView(server, roomId);
     await this.broadcastBedStatus(server, roomId, token);
+
+    return await this.getMyQueue(user.id);
   }
 
   async leftBookingQueue(server: Server, roomId: number, token: string) {
@@ -48,9 +56,33 @@ export class BookingService {
         .from('booking_queue')
         .delete()
         .eq('user_id', user.id);
+
+      await this.moveQueue(roomId, myQueue.queue_no);
     }
     await this.broadcastCurentView(server, roomId);
     await this.broadcastBedStatus(server, roomId, token);
+  }
+
+  async moveQueue(roomId: number, fromQueueNo: number) {
+    const queue = await this.supabase
+      .getSupabaseClient()
+      .from('booking_queue')
+      .select()
+      .eq('room_id', roomId)
+      .gte('queue_no', fromQueueNo);
+
+    for (let i = 0; i < queue?.data?.length; i++) {
+      const q = queue?.data[i];
+
+      const result = await this.supabase
+        .getSupabaseClient()
+        .from('booking_queue')
+        .update({
+          queue_no: q.queue_no - 1,
+        })
+        .eq('user_id', q.user_id)
+        .eq('room_id', q.room_id);
+    }
   }
 
   async getMyQueue(userId: number) {
@@ -62,6 +94,8 @@ export class BookingService {
       .single();
 
     if (queue?.data) {
+      const totalQueue = await this.getCurrentViewByRoom(queue.data.room_id);
+      queue.data.totalQueue = totalQueue || 0;
       return queue?.data;
     }
     return null;
@@ -84,6 +118,22 @@ export class BookingService {
       .eq('room_id', roomId);
 
     return queue?.count || 0;
+  }
+
+  async getNextQueueNoByRoom(roomId: number) {
+    const queue = await this.supabase
+      .getSupabaseClient()
+      .from('booking_queue')
+      .select()
+      .eq('room_id', roomId);
+
+    if (queue.data?.length === 0) {
+      return 1;
+    }
+
+    return (
+      (Math.max(...(queue.data || []).map((o) => o.queue_no || 0)) || 0) + 1
+    );
   }
 
   async lockBedQueue(
@@ -173,14 +223,11 @@ export class BookingService {
         .eq('locked_user_id', user.id);
 
       // Booked Flag to Bed
-      await this.supabase
-        .getSupabaseClient()
-        .from('booking_history')
-        .insert({
-          user_id: user.id,
-          bed_id: bedId,
-          room_id: roomId,
-        })
+      await this.supabase.getSupabaseClient().from('booking_history').insert({
+        user_id: user.id,
+        bed_id: bedId,
+        room_id: roomId,
+      });
     }
     await this.broadcastBedStatus(server, roomId, token);
   }
@@ -298,5 +345,9 @@ export class BookingService {
     }
 
     return false;
+  }
+
+  async broadcastQueueValidator(server: Server, roomId: number) {
+    server.emit('updateCurrentBookingView', {});
   }
 }
