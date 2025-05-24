@@ -21,9 +21,11 @@
   - [x] Rooms List
   - [x] Gen UserID and Profile via Socket Sessions
 - [x] Rooms Detail Page
-  - [x] Waiting Queue
+  - [x] Waiting Queue ( Limit for 5 Person in 1 Room )
   - [x] Seat List (5 Seat per room)
   - [x] Seat Selectors
+  - [x] Booking Process
+  - [x] Lock Seat by Selected
 - [x] Admin Page
   - [x] Rooms List
 
@@ -33,3 +35,5 @@
 - [x] Bookings API
 
 ## Booking Logic
+
+- []
