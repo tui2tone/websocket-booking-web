@@ -12,7 +12,7 @@ export async function getRooms() {
   }
 }
 
-export async function getRoomById(id: string) {
+export async function getRoomById(id: number) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/${id}`);
     if (!response.ok) {
@@ -20,7 +20,7 @@ export async function getRoomById(id: string) {
     }
 
     const json = await response.json();
-    return json?.data || []
+    return json || {}
   } catch (error) {
     return [];
   }
