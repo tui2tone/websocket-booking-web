@@ -41,7 +41,7 @@ const RoomLists: React.FC = () => {
                 <div className="font-bold flex-1">{room.name}</div>
 
                 <div>
-                  {room.slot} / {room.available_slot}
+                  {room.available_slot} / {room.slot}
                 </div>
               </div>
             );

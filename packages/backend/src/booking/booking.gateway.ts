@@ -17,7 +17,7 @@ import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { BookingService } from './booking.service';
 
-const maxQueueInRoom = 2;
+const maxQueueInRoom = 5;
 @WebSocketGateway()
 export class BookingGateway {
   @WebSocketServer() server: Server;
