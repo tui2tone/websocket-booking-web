@@ -4,7 +4,7 @@ import { FaEye } from "react-icons/fa";
 const PageHeader: React.FC<{
   title: string;
   description?: string;
-  currentView?: number;
+  currentView: number;
 }> = ({ title, description, currentView }) => {
   return (
     <div className="relative">
@@ -28,12 +28,12 @@ const PageHeader: React.FC<{
           dangerouslySetInnerHTML={{ __html: title }}
         ></h2>
 
-        <div className="mt-6">
+        {currentView > -1 && <div className="mt-6">
           <div className="flex flex-wrap justify-center items-center text-white text-xl gap-2">
             <FaEye />
             <span className="text-xl font-bold">{currentView || 0}</span>
           </div>
-        </div>
+        </div> }
       </div>
     </div>
   );

@@ -10,25 +10,20 @@ import {
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { User } from './entities/user.entity';
 import { faker } from '@faker-js/faker';
+import { AuthService } from './auth.service';
 @Controller('auth')
 export class AuthController {
   private logger = new Logger(AuthController.name);
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly service: AuthService,
+    private readonly supabase: SupabaseService
+  ) {}
   @Get()
   async authen(@Headers('Authorization') authToken: string) {
     try {
-      const existUser = await this.supabase
-        .getSupabaseClient()
-        .from('users')
-        .select()
-        .eq('uuid', authToken)
-        .single()
+      const existUser = await this.service.findUserByToken(authToken);
 
-      if (existUser?.data) {
-        return existUser?.data;
-      }
-
-      const created = await this.supabase
+      await this.supabase
         .getSupabaseClient()
         .from('users')
         .insert({
@@ -36,14 +31,8 @@ export class AuthController {
           email: faker.internet.email(),
         } as User)
 
-      const createdUser = await this.supabase
-        .getSupabaseClient()
-        .from('users')
-        .select()
-        .eq('uuid', authToken)
-        .single()
-
-      return createdUser?.data;
+      const createdUser = await this.service.findUserByToken(authToken);
+      return createdUser;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
