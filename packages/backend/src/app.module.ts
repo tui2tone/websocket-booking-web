@@ -4,6 +4,8 @@ import { BookingModule } from './booking/booking.module';
 import { ConfigModule } from '@nestjs/config';
 import { SupabaseModule } from './supabase/supabase.module';
 import { BedsModule } from './beds/beds.module';
+import { AuthModule } from './auth/auth.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { BedsModule } from './beds/beds.module';
     BookingModule,
     SupabaseModule,
     BedsModule,
+    AuthModule,
+    ProfileModule,
   ],
   controllers: [],
   providers: [],

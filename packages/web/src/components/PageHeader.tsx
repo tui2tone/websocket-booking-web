@@ -1,4 +1,5 @@
 import React from "react";
+import { FaEye } from "react-icons/fa";
 
 const PageHeader: React.FC<{
   title: string;
@@ -18,9 +19,21 @@ const PageHeader: React.FC<{
         }}
       ></div>
       <div className="container mx-auto max-w-screen-lg py-16 md:py-32 relative z-2">
-        <div className="uppercase text-center text-white font-bold">{description}</div>
+        <div className="uppercase text-center text-white font-bold">
+          {description}
+        </div>
         <div className="h-1 w-40 border-b border-white mx-auto opacity-50 my-4"></div>
-        <h2 className="text-center font-bold text-white text-5xl" dangerouslySetInnerHTML={{ __html: title }}></h2>
+        <h2
+          className="text-center font-bold text-white text-5xl"
+          dangerouslySetInnerHTML={{ __html: title }}
+        ></h2>
+
+        <div className="mt-6">
+          <div className="flex flex-wrap justify-center items-center text-white text-xl gap-2">
+            <FaEye />
+            <span className="text-xl font-bold">{currentView || 0}</span>
+          </div>
+        </div>
       </div>
     </div>
   );

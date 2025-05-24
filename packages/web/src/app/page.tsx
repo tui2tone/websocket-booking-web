@@ -1,6 +1,9 @@
+'use client';
+
 import RoomLists from "@/components/Dashboard/RoomLists";
 import Navbar from "@/components/Navbar";
 import PageHeader from "@/components/PageHeader";
+import { webSocketUrl } from "@/constants/socketio";
 import PageLayout from "@/layouts/PageLayout";
 import Image from "next/image";
 
